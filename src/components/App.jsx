@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import { nanoid } from 'nanoid';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import { ContactForm } from './ContactForm/ContactForm';
 import { ContactList } from './ContactList/ContactList';
 import { Filter } from './Filter/Filter';
@@ -35,7 +37,7 @@ export class App extends Component {
     });
 
     if (isExist) {
-      return alert(`${contact.name} is already in contacts.`);
+      return toast.warn(`${contact.name} is already in contacts.`);
     }
 
     const newContact = {
@@ -81,6 +83,7 @@ export class App extends Component {
           contacts={this.filteredContacts()}
           onDeleteContact={this.deleteContact}
         ></ContactList>
+        <ToastContainer position="top-center" />
       </Section>
     );
   }
