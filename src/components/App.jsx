@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import { useState, useEffect } from 'react';
 import { nanoid } from 'nanoid';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -7,32 +7,26 @@ import { ContactList } from './ContactList/ContactList';
 import { Filter } from './Filter/Filter';
 import { MainHeader, SecondaryHeader, Section } from './App.styled';
 
-export class App extends Component {
-  state = {
-    contacts: [
-      { id: 'id-1', name: 'Rosie Simpson', number: '459-12-56' },
-      { id: 'id-2', name: 'Hermione Kline', number: '443-89-12' },
-      { id: 'id-3', name: 'Eden Clements', number: '645-17-79' },
-      { id: 'id-4', name: 'Annie Copeland', number: '227-91-26' },
-    ],
-    filter: '',
-  };
-
-  componentDidMount() {
+export const App = () => {
+  const [contacts, setContacts] = useState(() => {
     const parsedContacts = JSON.parse(localStorage.getItem('contacts'));
-    if (parsedContacts) {
-      this.setState({ contacts: parsedContacts });
-    }
-  }
+    return parsedContacts
+      ? parsedContacts
+      : [
+          { id: 'id-1', name: 'Rosie Simpson', number: '459-12-56' },
+          { id: 'id-2', name: 'Hermione Kline', number: '443-89-12' },
+          { id: 'id-3', name: 'Eden Clements', number: '645-17-79' },
+          { id: 'id-4', name: 'Annie Copeland', number: '227-91-26' },
+        ];
+  });
+  const [filter, setFilter] = useState('');
 
-  componentDidUpdate(_, prevState) {
-    if (prevState.contacts.length !== this.state.contacts.length) {
-      localStorage.setItem('contacts', JSON.stringify(this.state.contacts));
-    }
-  }
+  useEffect(() => {
+    localStorage.setItem('contacts', JSON.stringify(contacts));
+  }, [contacts]);
 
-  addContact = contact => {
-    const isExist = this.state.contacts.find(({ name }) => {
+  const addContact = contact => {
+    const isExist = contacts.find(({ name }) => {
       return contact.name.toLowerCase() === name.toLowerCase();
     });
 
@@ -45,18 +39,14 @@ export class App extends Component {
       ...contact,
     };
 
-    this.setState(({ contacts }) => ({
-      contacts: [newContact, ...contacts],
-    }));
+    setContacts(prevContacts => [newContact, ...prevContacts]);
   };
 
-  changeFilter = event => {
-    this.setState({ filter: event.currentTarget.value });
+  const changeFilter = event => {
+    setFilter(event.currentTarget.value);
   };
 
-  filteredContacts = () => {
-    const { filter, contacts } = this.state;
-
+  const filteredContacts = () => {
     const normalizedFilter = filter.toLowerCase();
 
     return contacts.filter(contact =>
@@ -64,27 +54,23 @@ export class App extends Component {
     );
   };
 
-  deleteContact = contactId => {
-    this.setState(({ contacts }) => ({
-      contacts: contacts.filter(contact => contact.id !== contactId),
-    }));
+  const deleteContact = contactId => {
+    setContacts(prevContacts =>
+      prevContacts.filter(contact => contact.id !== contactId)
+    );
   };
 
-  render() {
-    const { filter } = this.state;
-
-    return (
-      <Section>
-        <MainHeader>Phonebook</MainHeader>
-        <ContactForm onSubmit={this.addContact}></ContactForm>
-        <SecondaryHeader>Contacts</SecondaryHeader>
-        <Filter value={filter} changeFilter={this.changeFilter}></Filter>
-        <ContactList
-          contacts={this.filteredContacts()}
-          onDeleteContact={this.deleteContact}
-        ></ContactList>
-        <ToastContainer position="top-center" />
-      </Section>
-    );
-  }
-}
+  return (
+    <Section>
+      <MainHeader>Phonebook</MainHeader>
+      <ContactForm onSubmit={addContact}></ContactForm>
+      <SecondaryHeader>Contacts</SecondaryHeader>
+      <Filter value={filter} changeFilter={changeFilter}></Filter>
+      <ContactList
+        contacts={filteredContacts()}
+        onDeleteContact={deleteContact}
+      ></ContactList>
+      <ToastContainer position="top-center" />
+    </Section>
+  );
+};
