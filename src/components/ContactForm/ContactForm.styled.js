@@ -7,6 +7,8 @@ export const Form = styled.form`
   gap: 15px;
   padding: 15px;
   margin-bottom: 30px;
+  margin-right: auto;
+  margin-left: auto;
   border: 1px solid #000000;
   border-radius: 4px;
 `;
@@ -38,6 +40,7 @@ export const SubmitButton = styled.button`
 
   &:hover,
   &:focus {
-    background-color: #c4c4c4;
+    background-color: #1f1fac;
+    color: #ffffff;
   }
 `;

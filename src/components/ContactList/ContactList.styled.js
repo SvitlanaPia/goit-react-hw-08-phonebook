@@ -1,4 +1,16 @@
 import styled, { keyframes } from 'styled-components';
+import { Box } from '@mui/material';
+import { Person } from '@mui/icons-material';
+
+export const StyledContactInfoIcon = styled(Person)`
+  margin-right: 10px;
+`;
+
+export const StyledDiv = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
 
 export const List = styled.ul`
   padding-left: 30px;
@@ -57,4 +69,22 @@ export const Spinner = styled.div`
   margin-left: 70px;
 
   animation: ${spin} 1s ease-in-out infinite;
+`;
+
+export const ContactListContainer = styled(Box)({
+  width: '100%',
+  maxWidth: 600,
+  backgroundColor: '#FFFFFF',
+});
+
+export const ContactListItem = styled.li`
+  display: flex;
+  align-items: center;
+  padding: 8px 16px;
+  cursor: pointer;
+  border-bottom: 1px solid gray;
+
+  &:last-child {
+    border-bottom: none;
+  }
 `;

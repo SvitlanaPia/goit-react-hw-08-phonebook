@@ -1,5 +1,14 @@
-import { createSlice } from '@reduxjs/toolkit';
-import { fetchContacts, addContact, deleteContact } from './operations';
+import { createSlice, isAnyOf } from '@reduxjs/toolkit';
+import {
+  fetchContacts,
+  addContact,
+  deleteContact,
+  editContact,
+  logOut,
+} from './operations';
+
+const extraActions = [fetchContacts, addContact, deleteContact];
+const getActions = type => extraActions.map(action => action[type]);
 
 const initialState = {
   items: [],
@@ -44,20 +53,42 @@ const handleDeleteContactSuccess = (state, action) => {
   };
 };
 
+const handleEditContactSuccess = (state, action) => {
+  return {
+    ...state,
+    isLoading: false,
+    error: null,
+    items: state.items.map(item => {
+      if (item.id === action.payload.id) {
+        return action.payload;
+      }
+      return item;
+    }),
+  };
+};
+
+const handleLogoutSuccess = state => {
+  return {
+    ...state,
+    isLoading: false,
+    error: null,
+    items: [],
+  };
+};
+
 const contactsSlice = createSlice({
   name: 'contacts',
   initialState,
-  extraReducers: {
-    [fetchContacts.pending]: handlePending,
-    [addContact.pending]: handlePending,
-    [deleteContact.pending]: handlePending,
-    [fetchContacts.rejected]: handleRejected,
-    [addContact.rejected]: handleRejected,
-    [deleteContact.rejected]: handleRejected,
-    [fetchContacts.fulfilled]: handleFetchContactsSuccess,
-    [addContact.fulfilled]: handleAddContactSuccess,
-    [deleteContact.fulfilled]: handleDeleteContactSuccess,
-  },
+  reducers: {},
+  extraReducers: builder =>
+    builder
+      .addMatcher(isAnyOf(...getActions('pending')), handlePending)
+      .addMatcher(isAnyOf(...getActions('rejected')), handleRejected)
+      .addMatcher(isAnyOf(fetchContacts.fulfilled), handleFetchContactsSuccess)
+      .addMatcher(isAnyOf(addContact.fulfilled), handleAddContactSuccess)
+      .addMatcher(isAnyOf(deleteContact.fulfilled), handleDeleteContactSuccess)
+      .addMatcher(isAnyOf(editContact.fulfilled), handleEditContactSuccess)
+      .addMatcher(isAnyOf(logOut.fulfilled), handleLogoutSuccess),
 });
 
 export const contactsReducer = contactsSlice.reducer;
